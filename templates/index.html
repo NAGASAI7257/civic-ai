@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Civic AI</title>
+
+<style>
+body {
+    font-family: Arial;
+    background:#eef2f7;
+}
+
+.container {
+    width: 40%;
+    margin: 40px auto;
+    background:white;
+    padding:25px;
+    border-radius:12px;
+}
+
+h1 { text-align:center; }
+
+label {
+    font-weight:bold;
+    display:block;
+    margin-top:15px;
+}
+
+input, textarea, select {
+    width:100%;
+    padding:10px;
+    margin-top:5px;
+    border-radius:6px;
+    border:1px solid #ccc;
+}
+
+.helper {
+    font-size:12px;
+    color:gray;
+}
+
+#preview {
+    margin-top:10px;
+    max-width:100%;
+    border-radius:8px;
+}
+
+button {
+    margin-top:20px;
+    width:100%;
+    padding:12px;
+    background:#007bff;
+    color:white;
+    border:none;
+    border-radius:8px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🚀 Report Civic Issue</h1>
+
+<form action="/submit" method="POST" enctype="multipart/form-data">
+
+<label>Your Name</label>
+<input type="text" name="name" required>
+
+<label>Select Issue Type</label>
+<select name="issue">
+<option>Garbage problem</option>
+<option>Pothole on road</option>
+<option>Water leakage</option>
+<option>Electricity issue</option>
+<option>Traffic congestion</option>
+<option>Stray animals</option>
+<option>Noise pollution</option>
+<option>Parking issue</option>
+<option>Drain blockage</option>
+<option>Flooding</option>
+<option>Broken streetlight</option>
+<option>Open manhole</option>
+<option>Construction disturbance</option>
+<option>Other</option>
+</select>
+
+<label>Describe the Issue</label>
+<textarea name="issue" placeholder="Example: Large pothole near college gate causing accidents" required></textarea>
+
+<label>Area / Location</label>
+<input type="text" name="location" placeholder="Example: BMSIT Campus" required>
+
+<p class="helper">Be specific so authorities can locate faster</p>
+
+<label>Nearby Landmark</label>
+<input type="text" name="landmark" placeholder="Example: Near Main Gate / Bus Stop">
+
+<label>Upload Photo of the Problem (Required)</label>
+<input type="file" name="photo" accept="image/*" onchange="previewImage(event)" required>
+
+<p class="helper">Photo helps verify and prioritize your complaint</p>
+
+<img id="preview">
+
+<button type="submit">Submit Complaint</button>
+
+</form>
+
+</div>
+
+<script>
+function previewImage(event) {
+    let reader = new FileReader();
+    reader.onload = function(){
+        document.getElementById('preview').src = reader.result;
+    }
+    reader.readAsDataURL(event.target.files[0]);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+from flask import Flask, render_template, request, redirect
+from datetime import datetime
+import os
+from werkzeug.utils import secure_filename
+
+
+app = Flask(__name__)
+
+UPLOAD_FOLDER = "static/uploads"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+complaints = []
+
+
+def classify_issue(text):
+    text = text.lower()
+
+    mapping = {
+        "Waste Management": ["garbage", "trash", "waste", "dustbin"],
+        "Road Damage": ["pothole", "road", "crack"],
+        "Water Issue": ["leak", "water", "sewage", "drain"],
+        "Electricity Issue": ["power", "electric", "light"],
+        "Streetlight Issue": ["streetlight", "lamp"],
+        "Traffic Issue": ["traffic", "jam", "signal"],
+        "Parking Issue": ["parking", "illegal parking"],
+        "Stray Animal": ["dog", "animal"],
+        "Noise Pollution": ["noise", "loud"],
+        "Air Pollution": ["smoke", "pollution"],
+        "Construction Issue": ["construction", "debris"],
+        "Public Transport": ["bus", "transport"],
+        "Flooding": ["flood", "water logging"],
+        "Blocked Drain": ["blocked drain", "clog"],
+        "Tree Fall": ["tree fallen"],
+        "Encroachment": ["encroach"],
+        "Broken Signboard": ["signboard"],
+        "Footpath Issue": ["footpath"],
+        "Open Manhole": ["manhole"],
+        "Fire Hazard": ["fire", "spark"],
+        "General": [],
+    }
+
+    for category, keywords in mapping.items():
+        if any(word in text for word in keywords):
+
+            if category in [
+                "Waste Management",
+                "Road Damage",
+                "Water Issue",
+                "Electricity Issue",
+                "Flooding",
+                "Open Manhole",
+                "Fire Hazard",
+            ]:
+                return category, "High"
+
+            if category in [
+                "Traffic Issue",
+                "Parking Issue",
+                "Stray Animal",
+                "Construction Issue",
+            ]:
+                return category, "Medium"
+
+            return category, "Low"
+
+    return "General", "Medium"
+
+
+def get_priority_score(priority):
+    return {"High": 3, "Medium": 2, "Low": 1}.get(priority, 2)
+
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+
+@app.route("/submit", methods=["POST"])
+def submit():
+    name = request.form["name"]
+    issue = request.form["issue"]
+    location = request.form["location"]
+    landmark = request.form["landmark"]
+
+    file = request.files["photo"]
+    filename = secure_filename(file.filename)
+
+    filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    file.save(filepath)
+
+    category, priority = classify_issue(issue)
+    score = get_priority_score(priority)
+
+    # Duplicate detection
+    for c in complaints:
+        if (
+            c["location"].lower() == location.lower()
+            and issue.lower() in c["issue"].lower()
+        ):
+            c["count"] += 1
+            return redirect("/admin")
+
+    complaint = {
+        "name": name,
+        "issue": issue,
+        "location": location,
+        "landmark": landmark,
+        "category": category,
+        "priority": priority,
+        "score": score,
+        "count": 1,
+        "photo": filepath,
+        "time": datetime.now().strftime("%d %b %Y, %H:%M"),
+    }
+
+    complaints.append(complaint)
+
+    return redirect("/admin")
+
+
+@app.route("/admin")
+def admin():
+    sorted_complaints = sorted(
+        complaints,
+        key=lambda x: (x["score"], x["count"]),
+        reverse=True,
+    )
+    return render_template("admin.html", complaints=sorted_complaints)
+
+
+@app.route("/stats")
+def stats():
+    total = len(complaints)
+    high = len([c for c in complaints if c["priority"] == "High"])
+    medium = len([c for c in complaints if c["priority"] == "Medium"])
+    low = len([c for c in complaints if c["priority"] == "Low"])
+
+    data = {
+        "total": total,
+        "high": high,
+        "medium": medium,
+        "low": low,
+    }
+
+    return render_template("stats.html", data=data)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

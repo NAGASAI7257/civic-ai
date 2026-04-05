@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Civic Dashboard</title>
+
+<style>
+body {
+    font-family: Arial;
+    background:#eef2f7;
+    margin:0;
+}
+
+.header {
+    background:#007bff;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.container {
+    width:80%;
+    margin:20px auto;
+}
+
+/* ===== STATS ===== */
+.stats {
+    display:flex;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.stat-card {
+    flex:1;
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+    font-weight:bold;
+}
+
+.high-box { border-top:5px solid red; }
+.medium-box { border-top:5px solid orange; }
+.low-box { border-top:5px solid green; }
+
+/* ===== FILTER BAR ===== */
+.filter {
+    margin-bottom:20px;
+}
+
+select {
+    padding:10px;
+    border-radius:6px;
+}
+
+/* ===== CARDS ===== */
+.card {
+    background:white;
+    padding:18px;
+    margin-bottom:15px;
+    border-radius:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.left {
+    width:70%;
+}
+
+.right {
+    width:25%;
+    text-align:center;
+}
+
+.high { border-left:6px solid red; }
+.medium { border-left:6px solid orange; }
+.low { border-left:6px solid green; }
+
+.badge {
+    padding:4px 10px;
+    border-radius:6px;
+    color:white;
+    font-size:12px;
+}
+
+.badge.high { background:red; }
+.badge.medium { background:orange; }
+.badge.low { background:green; }
+
+img {
+    width:100%;
+    border-radius:10px;
+}
+
+/* TEXT */
+.title {
+    font-size:16px;
+    font-weight:bold;
+}
+
+.meta {
+    color:gray;
+    font-size:13px;
+}
+
+.count {
+    font-size:14px;
+    font-weight:bold;
+    color:#ff5722;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+🚀 Civic AI Dashboard
+</div>
+
+<div class="container">
+
+<!-- ===== STATS ===== -->
+<div class="stats">
+    <div class="stat-card high-box">🔥 High Priority<br>{{ complaints | selectattr('priority','equalto','High') | list | length }}</div>
+    <div class="stat-card medium-box">⚠️ Medium<br>{{ complaints | selectattr('priority','equalto','Medium') | list | length }}</div>
+    <div class="stat-card low-box">✅ Low<br>{{ complaints | selectattr('priority','equalto','Low') | list | length }}</div>
+    <div class="stat-card">📊 Total<br>{{ complaints | length }}</div>
+</div>
+
+<!-- ===== FILTER ===== -->
+<div class="filter">
+<select onchange="filterPriority(this.value)">
+    <option value="all">All Issues</option>
+    <option value="high">High Priority</option>
+    <option value="medium">Medium Priority</option>
+    <option value="low">Low Priority</option>
+</select>
+</div>
+
+<!-- ===== COMPLAINTS ===== -->
+{% for c in complaints %}
+<div class="card {{ c.priority|lower }} complaint">
+
+<div class="left">
+    <div class="title">🛠️ {{ c.issue }}</div>
+    
+    <p class="meta">📍 {{ c.location }} | {{ c.landmark }}</p>
+    
+    <p>
+        <span class="badge {{ c.priority|lower }}">{{ c.priority }}</span>
+        | {{ c.category }}
+    </p>
+
+    <p class="count">🔥 {{ c.count }} people reported this</p>
+    
+    <p class="meta">⏱ {{ c.time }}</p>
+</div>
+
+<div class="right">
+    <img src="{{ c.photo }}">
+</div>
+
+</div>
+{% endfor %}
+
+</div>
+
+<script>
+function filterPriority(level){
+    let cards = document.getElementsByClassName("complaint");
+    for(let c of cards){
+        if(level === "all"){
+            c.style.display = "flex";
+        } else {
+            if(c.classList.contains(level)){
+                c.style.display = "flex";
+            } else {
+                c.style.display = "none";
+            }
+        }
+    }
+}
+</script>
+
+</body>
+</html>
