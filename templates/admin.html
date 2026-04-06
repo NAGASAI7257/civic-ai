@@ -1,166 +1,254 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>AI Civic Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Citizen Dashboard</title>
 
 <style>
 body {
-    font-family: Arial;
+    font-family: 'Segoe UI', sans-serif;
     background:#eef2f7;
     margin:0;
 }
 
+/* HEADER */
 .header {
-    background:#007bff;
+    background: linear-gradient(90deg,#007bff,#00c6ff);
     color:white;
-    padding:15px;
+    padding:20px;
     text-align:center;
-    font-size:22px;
+    font-size:24px;
     font-weight:bold;
 }
 
+/* NAVBAR */
+.navbar {
+    background:#0056b3;
+    padding:10px;
+    text-align:center;
+}
+.navbar a {
+    color:white;
+    margin:0 15px;
+    text-decoration:none;
+    font-weight:bold;
+}
+.navbar a:hover {
+    text-decoration:underline;
+}
+
+/* CONTAINER */
 .container {
-    width:80%;
+    width:90%;
+    max-width:1100px;
     margin:20px auto;
 }
 
-/* ===== STATS ===== */
+/* BANNER */
+.challenge-banner {
+    background: linear-gradient(45deg,#28a745,#20c997);
+    color:white;
+    text-align:center;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:20px;
+    font-weight:bold;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* STATS */
 .stats {
     display:flex;
+    flex-wrap: wrap;
     gap:15px;
     margin-bottom:20px;
 }
 
 .stat-card {
     flex:1;
+    min-width:150px;
     background:white;
-    padding:15px;
-    border-radius:10px;
+    padding:20px;
+    border-radius:12px;
     text-align:center;
     font-weight:bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition:0.3s;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
 }
 
 .high-box { border-top:5px solid red; }
 .medium-box { border-top:5px solid orange; }
 .low-box { border-top:5px solid green; }
+.total-box { border-top:5px solid #007bff; }
 
-/* ===== FILTER BAR ===== */
-.filter {
-    margin-bottom:20px;
+/* FILTER + SEARCH */
+.top-bar {
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    margin-bottom:15px;
 }
 
-select {
+select, input {
     padding:10px;
     border-radius:6px;
+    border:1px solid #ccc;
+    margin:5px;
 }
 
-/* ===== CARDS ===== */
+/* CARDS */
 .card {
     background:white;
-    padding:18px;
+    padding:20px;
     margin-bottom:15px;
     border-radius:12px;
     display:flex;
     justify-content:space-between;
     align-items:center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition:0.3s;
+}
+.card:hover {
+    transform:scale(1.02);
 }
 
-.left {
-    width:70%;
-}
-
-.right {
-    width:25%;
-    text-align:center;
-}
+.left { width:70%; }
+.right { width:25%; text-align:center; }
 
 .high { border-left:6px solid red; }
 .medium { border-left:6px solid orange; }
 .low { border-left:6px solid green; }
 
 .badge {
-    padding:4px 10px;
+    padding:5px 12px;
     border-radius:6px;
     color:white;
-    font-size:12px;
+    font-size:13px;
 }
-
 .badge.high { background:red; }
 .badge.medium { background:orange; }
 .badge.low { background:green; }
 
+/* AI TAG */
+.ai-tag {
+    background:#e3f2fd;
+    color:#007bff;
+    padding:4px 8px;
+    border-radius:6px;
+    font-size:12px;
+    margin-left:5px;
+}
+
+/* IMAGE */
 img {
     width:100%;
     border-radius:10px;
+    max-height:150px;
+    object-fit:cover;
 }
 
 /* TEXT */
 .title {
-    font-size:16px;
+    font-size:18px;
     font-weight:bold;
 }
-
 .meta {
     color:gray;
     font-size:13px;
 }
-
 .count {
     font-size:14px;
     font-weight:bold;
     color:#ff5722;
 }
-</style>
+.points {
+    color:#28a745;
+    font-weight:bold;
+}
 
+/* MOBILE */
+@media(max-width:768px){
+    .card {
+        flex-direction:column;
+    }
+    .left, .right {
+        width:100%;
+    }
+}
+</style>
 </head>
 
 <body>
 
 <div class="header">
-🚀 Civic AI Dashboard
+🌱 Smart Citizen Dashboard
+</div>
+
+<div class="navbar">
+    <a href="/">🏠 Home</a>
+    <a href="/stats">📊 Stats</a>
+    <a href="/admin">📋 Dashboard</a>
 </div>
 
 <div class="container">
 
-<!-- ===== STATS ===== -->
+<div class="challenge-banner">
+🎯 Complete challenges & earn rewards!  
+<a href="/challenges?user=Guest" style="color:white;">View Now →</a>
+</div>
+
+<!-- STATS -->
 <div class="stats">
-    <div class="stat-card high-box">🔥 High Priority<br>{{ complaints | selectattr('priority','equalto','High') | list | length }}</div>
+    <div class="stat-card high-box">🔥 High<br>{{ complaints | selectattr('priority','equalto','High') | list | length }}</div>
     <div class="stat-card medium-box">⚠️ Medium<br>{{ complaints | selectattr('priority','equalto','Medium') | list | length }}</div>
     <div class="stat-card low-box">✅ Low<br>{{ complaints | selectattr('priority','equalto','Low') | list | length }}</div>
-    <div class="stat-card">📊 Total<br>{{ complaints | length }}</div>
+    <div class="stat-card total-box">📊 Total<br>{{ complaints | length }}</div>
 </div>
 
-<!-- ===== FILTER ===== -->
-<div class="filter">
-<select onchange="filterPriority(this.value)">
-    <option value="all">All Issues</option>
-    <option value="high">High Priority</option>
-    <option value="medium">Medium Priority</option>
-    <option value="low">Low Priority</option>
-</select>
+<!-- FILTER + SEARCH -->
+<div class="top-bar">
+    <select onchange="filterPriority(this.value)">
+        <option value="all">All Issues</option>
+        <option value="high">High Priority</option>
+        <option value="medium">Medium Priority</option>
+        <option value="low">Low Priority</option>
+    </select>
+
+    <input type="text" id="searchBox" placeholder="Search issues..." onkeyup="searchIssues()">
 </div>
 
-<!-- ===== COMPLAINTS ===== -->
+<!-- CARDS -->
 {% for c in complaints %}
 <div class="card {{ c.priority|lower }} complaint">
 
 <div class="left">
     <div class="title">🛠️ {{ c.issue }}</div>
-    
+
     <p class="meta">📍 {{ c.location }} | {{ c.landmark }}</p>
-    
+
     <p>
         <span class="badge {{ c.priority|lower }}">{{ c.priority }}</span>
+        <span class="ai-tag">AI Classified</span>
         | {{ c.category }}
     </p>
 
-    <p class="count">🔥 {{ c.count }} people reported this</p>
-    
+    <p class="count">🔥 {{ c.count }} citizens reported</p>
+
+    <p class="points">+{{ 10 if c.priority=='Low' else 20 if c.priority=='Medium' else 30 }} pts reward</p>
+
     <p class="meta">⏱ {{ c.time }}</p>
 </div>
 
 <div class="right">
-    <img src="{{ c.photo }}">
+    {% if c.photo %}
+        <img src="{{ c.photo }}">
+    {% else %}
+        <p>No Image</p>
+    {% endif %}
 </div>
 
 </div>
@@ -169,18 +257,26 @@ img {
 </div>
 
 <script>
+// FILTER
 function filterPriority(level){
     let cards = document.getElementsByClassName("complaint");
     for(let c of cards){
         if(level === "all"){
             c.style.display = "flex";
         } else {
-            if(c.classList.contains(level)){
-                c.style.display = "flex";
-            } else {
-                c.style.display = "none";
-            }
+            c.style.display = c.classList.contains(level) ? "flex" : "none";
         }
+    }
+}
+
+// SEARCH
+function searchIssues(){
+    let input = document.getElementById("searchBox").value.toLowerCase();
+    let cards = document.getElementsByClassName("complaint");
+
+    for(let c of cards){
+        let text = c.innerText.toLowerCase();
+        c.style.display = text.includes(input) ? "flex" : "none";
     }
 }
 </script>
